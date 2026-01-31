@@ -62,70 +62,9 @@
 
 Write Kubernetes policies in plain YAML — no Rego, no new language to learn. [Kyverno](https://github.com/kyverno/kyverno) validates, mutates, and generates resources through admission webhooks. `CNCF Graduated`
 
-### [Disallow :latest tag](https://podostack.substack.com/i/185064206/the-policy-disallow-latest-tags)
+- **[Disallow :latest tag](https://podostack.substack.com/i/185064206/the-policy-disallow-latest-tags)** — The `:latest` tag is mutable — the image it points to can change anytime. This policy blocks containers without explicit tags, preventing unpredictable deployments and rollback nightmares.
 
-Don't let `:latest` sneak into production. This policy blocks any container image without an explicit tag or digest:
-
-```yaml
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
-metadata:
-  name: disallow-latest-tag
-spec:
-  validationFailureAction: Enforce
-  rules:
-    - name: require-image-tag
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      validate:
-        message: "An image tag is required."
-        pattern:
-          spec:
-            containers:
-              - image: "*:*"
-    - name: validate-image-tag
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      validate:
-        message: "Using ':latest' tag is not allowed."
-        pattern:
-          spec:
-            containers:
-              - image: "!*:latest"
-```
-
-### [Require labels](https://podostack.substack.com/i/185716285/the-policy-require-labels)
-
-Enforce mandatory labels on all pods — useful for cost allocation, ownership tracking, and filtering:
-
-```yaml
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
-metadata:
-  name: require-labels
-spec:
-  validationFailureAction: Enforce
-  rules:
-    - name: check-for-labels
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      validate:
-        message: "Labels 'app' and 'team' are required."
-        pattern:
-          metadata:
-            labels:
-              app: "?*"
-              team: "?*"
-```
+- **[Require labels](https://podostack.substack.com/i/185716285/the-policy-require-labels)** — Requires standard labels (`app.kubernetes.io/name`, `app.kubernetes.io/instance`) on Deployments, StatefulSets, and DaemonSets. Helps with cost allocation, automation, and keeping your cluster organized.
 
 ---
 
