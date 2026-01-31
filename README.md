@@ -12,8 +12,8 @@
 - [Autoscaling](#-autoscaling)
 - [Networking & Service Mesh](#-networking--service-mesh)
 - [Observability](#-observability)
-- [Policy & Security](#-policy--security)
 - [GitOps](#-gitops)
+- [Kyverno Policies](#-kyverno-policies)
 - [CLI Tools & One-Liners](#-cli-tools--one-liners)
 
 ---
@@ -23,55 +23,109 @@
 ### Image Distribution & Caching
 
 - **[Spegel](https://github.com/spegel-org/spegel)** - Nodes share container images directly with each other — no registry involved. Stateless P2P caching that speeds up scaling and cuts egress costs. `CNCF Sandbox`
-  - 📖 [Deep dive](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
 
 - **[Stargz Snapshotter](https://github.com/containerd/stargz-snapshotter)** - Start containers before the image fully downloads. Your app uses ~6% of files at startup — why pull 100%?
-  - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
 
 ---
 
 ## ⚡ Autoscaling
 
 - **[Karpenter](https://github.com/aws/karpenter)** - Provisions the exact node your pods need in seconds, not minutes. No node groups — just right-sized instances from any available type. `AWS` `GCP`
-  - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
 
 - **[Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)** - The battle-tested autoscaler that works through Node Groups. Slower than Karpenter but multi-cloud and familiar.
-  - 📖 [Comparison with Karpenter](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
 
 ---
 
 ## 🌐 Networking & Service Mesh
 
 - **[Cilium](https://github.com/cilium/cilium)** - Replaces kube-proxy with eBPF — O(1) lookups instead of walking iptables chains. Also does identity-based security and multi-cluster mesh. `CNCF Graduated`
-  - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
 
 - **[Istio Ambient](https://github.com/istio/istio)** - Service mesh without sidecars. Uses a node-level ztunnel for L4 and on-demand waypoint proxies for L7 — pay only for what you need. `CNCF Graduated`
-  - 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml)
 
 ---
 
 ## 📊 Observability
 
 - **[Pixie](https://github.com/pixie-io/pixie)** - See your cluster's HTTP, SQL, and DNS traffic without touching your code. Uses eBPF to capture data — including decrypted TLS. `CNCF Sandbox`
-  - 📖 [Deep dive](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
 
 - **[sloth](https://github.com/slok/sloth)** - Define your SLOs in YAML, get Prometheus rules and Grafana dashboards. No more hand-rolling burn rate calculations.
-  - 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml)
-
----
-
-## 🔒 Policy & Security
-
-- **[Kyverno](https://github.com/kyverno/kyverno)** - Kubernetes-native policy engine. Validate, mutate, and generate resources with simple YAML — no new language to learn. `CNCF Incubating`
-  - 📖 [Disallow :latest tags](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
-  - 📖 [Require labels](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml)
 
 ---
 
 ## 🚀 GitOps
 
 - **[Flux](https://github.com/fluxcd/flux2)** - GitOps toolkit that actually waits for your deployments to be ready, not just applied. Handles Helm, Kustomize, and multi-tenancy. `CNCF Graduated`
-  - 📖 [flux diff one-liner](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
+
+---
+
+## 📜 Kyverno Policies
+
+Production-ready policies for [Kyverno](https://github.com/kyverno/kyverno) — the Kubernetes-native policy engine. `CNCF Graduated`
+
+### Disallow :latest tag
+
+Don't let `:latest` sneak into production. This policy blocks any container image without an explicit tag or digest:
+
+```yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "An image tag is required."
+        pattern:
+          spec:
+            containers:
+              - image: "*:*"
+    - name: validate-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Using ':latest' tag is not allowed."
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"
+```
+
+### Require labels
+
+Enforce mandatory labels on all pods — useful for cost allocation, ownership tracking, and filtering:
+
+```yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-labels
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-for-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Labels 'app' and 'team' are required."
+        pattern:
+          metadata:
+            labels:
+              app: "?*"
+              team: "?*"
+```
 
 ---
 
@@ -85,8 +139,6 @@ Debug distroless containers by injecting ephemeral debug containers:
 kubectl debug -it my-pod --image=busybox --target=my-container
 ```
 
-- 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml)
-
 ### flux diff
 
 "Terraform plan" for Kubernetes — see what would change before applying:
@@ -94,8 +146,6 @@ kubectl debug -it my-pod --image=busybox --target=my-container
 ```bash
 flux diff kustomization my-app --path ./clusters/prod/
 ```
-
-- 📖 [Deep dive](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
 
 ### Karpenter drift detection
 
@@ -105,8 +155,6 @@ Check which nodes are marked for replacement:
 kubectl get nodeclaims -o custom-columns=\
 'NAME:.metadata.name,DRIFT:.status.conditions[?(@.type=="Drifted")].status'
 ```
-
-- 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
 
 ---
 
