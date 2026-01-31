@@ -62,7 +62,7 @@
 
 Production-ready policies for [Kyverno](https://github.com/kyverno/kyverno) — the Kubernetes-native policy engine. `CNCF Graduated`
 
-### Disallow :latest tag
+### [Disallow :latest tag](https://podostack.substack.com/i/185064206/the-policy-disallow-latest-tags)
 
 Don't let `:latest` sneak into production. This policy blocks any container image without an explicit tag or digest:
 
@@ -100,7 +100,7 @@ spec:
               - image: "!*:latest"
 ```
 
-### Require labels
+### [Require labels](https://podostack.substack.com/i/185716285/the-policy-require-labels)
 
 Enforce mandatory labels on all pods — useful for cost allocation, ownership tracking, and filtering:
 
