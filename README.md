@@ -60,7 +60,7 @@
 
 ## 📜 Kyverno Policies
 
-Production-ready policies for [Kyverno](https://github.com/kyverno/kyverno) — the Kubernetes-native policy engine. `CNCF Graduated`
+Write Kubernetes policies in plain YAML — no Rego, no new language to learn. [Kyverno](https://github.com/kyverno/kyverno) validates, mutates, and generates resources through admission webhooks. `CNCF Graduated`
 
 ### [Disallow :latest tag](https://podostack.substack.com/i/185064206/the-policy-disallow-latest-tags)
 
