@@ -23,32 +23,41 @@
 ### Image Distribution & Caching
 
 - **[Spegel](https://github.com/spegel-org/spegel)** - Nodes share container images directly with each other — no registry involved. Stateless P2P caching that speeds up scaling and cuts egress costs. `CNCF Sandbox`
+  - 📖 [Deep dive](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
 
 - **[Stargz Snapshotter](https://github.com/containerd/stargz-snapshotter)** - Start containers before the image fully downloads. Your app uses ~6% of files at startup — why pull 100%?
+  - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
 
 ---
 
 ## ⚡ Autoscaling
 
 - **[Karpenter](https://github.com/aws/karpenter)** - Provisions the exact node your pods need in seconds, not minutes. No node groups — just right-sized instances from any available type. `AWS` `GCP`
+  - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
+  - 💰 [FinOps patterns](https://podostack.substack.com/p/spot-consolidation-pod-packing-40-percent-overpaying) — SpotToSpot consolidation, affinity traps, the knobs that actually move the bill
 
 - **[Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)** - The battle-tested autoscaler that works through Node Groups. Slower than Karpenter but multi-cloud and familiar.
+  - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network) — side-by-side with Karpenter
 
 ---
 
 ## 🌐 Networking & Service Mesh
 
 - **[Cilium](https://github.com/cilium/cilium)** - Replaces kube-proxy with eBPF — O(1) lookups instead of walking iptables chains. Also does identity-based security and multi-cluster mesh. `CNCF Graduated`
+  - 📖 [Deep dive](https://podostack.substack.com/p/cilium-ebpf-kube-proxy-identity-hubble) — kube-proxy replacement, Hubble, identity policies, egress gateway, cluster mesh
 
 - **[Istio Ambient](https://github.com/istio/istio)** - Service mesh without sidecars. Uses a node-level ztunnel for L4 and on-demand waypoint proxies for L7 — pay only for what you need. `CNCF Graduated`
+  - 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml-and)
 
 ---
 
 ## 📊 Observability
 
 - **[Pixie](https://github.com/pixie-io/pixie)** - See your cluster's HTTP, SQL, and DNS traffic without touching your code. Uses eBPF to capture data — including decrypted TLS. `CNCF Sandbox`
+  - 📖 [Deep dive](https://podostack.substack.com/p/spegel-pixie-and-why-latest-is-evil)
 
 - **[sloth](https://github.com/slok/sloth)** - Define your SLOs in YAML, get Prometheus rules and Grafana dashboards. No more hand-rolling burn rate calculations.
+  - 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml-and)
 
 ---
 
