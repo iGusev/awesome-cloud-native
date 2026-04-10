@@ -9,10 +9,13 @@
 ## Contents
 
 - [Container Images](#-container-images)
+- [Runtime](#-runtime)
 - [Supply Chain & Runtime Security](#-supply-chain--runtime-security)
 - [Autoscaling](#-autoscaling)
+- [Workload Scheduling](#-workload-scheduling)
 - [Networking & Service Mesh](#-networking--service-mesh)
 - [Observability](#-observability)
+- [Messaging](#-messaging)
 - [GitOps](#-gitops)
 - [Platform Engineering](#-platform-engineering)
 - [Kyverno Policies](#-kyverno-policies)
@@ -29,6 +32,13 @@
 
 - **[Stargz Snapshotter](https://github.com/containerd/stargz-snapshotter)** - Start containers before the image fully downloads. Your app uses ~6% of files at startup — why pull 100%?
   - 📖 [Deep dive](https://podostack.substack.com/p/lazy-pull-smart-scale-ebpf-network)
+
+---
+
+## 🧩 Runtime
+
+- **[WasmEdge](https://github.com/WasmEdge/WasmEdge)** - Server-side WebAssembly runtime with ahead-of-time compilation. Cold start in milliseconds and single-digit MB modules, sandboxed by default — fits FaaS, edge processing, and plugin systems where containers are too heavy. `CNCF Incubating`
+  - 📖 [Deep dive](https://podostack.substack.com/p/dapr-kargo-wasmedge-koordinator-openfeature) — Solomon Hykes's "if Wasm+WASI existed in 2008" take, revisited
 
 ---
 
@@ -63,6 +73,13 @@
 
 ---
 
+## ⚙️ Workload Scheduling
+
+- **[Koordinator](https://github.com/koordinator-sh/koordinator)** - Colocation scheduler that runs best-effort batch jobs on the CPU your latency-sensitive services reserved but aren't actually using. Alibaba reports ~15% → 50%+ cluster utilization in production, with hardware-level LLC and memory-bandwidth isolation to stop noisy neighbors. `CNCF Sandbox`
+  - 📖 [Deep dive](https://podostack.substack.com/p/dapr-kargo-wasmedge-koordinator-openfeature)
+
+---
+
 ## 🌐 Networking & Service Mesh
 
 - **[Cilium](https://github.com/cilium/cilium)** - Replaces kube-proxy with eBPF — O(1) lookups instead of walking iptables chains. Also does identity-based security and multi-cluster mesh. `CNCF Graduated`
@@ -80,6 +97,35 @@
 
 - **[sloth](https://github.com/slok/sloth)** - Define your SLOs in YAML, get Prometheus rules and Grafana dashboards. No more hand-rolling burn rate calculations.
   - 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml-and)
+
+### 📈 Metrics & Telemetry
+
+- **[Thanos](https://github.com/thanos-io/thanos)** - Long-term storage, global query, and HA for Prometheus. Writes TSDB blocks to S3-compatible object storage and queries across them plus live Prometheus in one PromQL. `CNCF Incubating`
+  - 📖 [Deep dive](https://podostack.substack.com/p/flame-graphs-prod-prometheus-scale-fourth-signal)
+
+- **[VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics)** - Drop-in Prometheus-compatible TSDB that's significantly leaner on memory and disk. Built for billion-series workloads without the Thanos/Cortex operational complexity.
+  - 📖 [Deep dive](https://podostack.substack.com/p/flame-graphs-prod-prometheus-scale-fourth-signal)
+
+- **[OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector)** - Vendor-neutral telemetry gateway for traces, metrics, and logs. Receivers, processors, and exporters as pluggable modules — ship to Prometheus, Loki, Tempo, Datadog, or anything OTLP-compatible. `CNCF Graduated`
+  - 📖 [Deep dive](https://podostack.substack.com/p/flame-graphs-prod-prometheus-scale-fourth-signal)
+
+- **[Grafana Alloy](https://github.com/grafana/alloy)** - One agent to replace Prometheus, Promtail, and an OTel Collector. Programmable config language and built-in clustering that distributes scrape targets across instances — vendor-neutral despite the Grafana branding.
+  - 📖 [Deep dive](https://podostack.substack.com/p/ebpf-tetragon-parca-falco-sloth-alloy)
+
+### 🔥 Continuous Profiling
+
+- **[Pyroscope](https://github.com/grafana/pyroscope)** - Continuous profiling with flame graphs and differential profiling — compare today's deployment to yesterday's and find which function started eating CPU. Part of Grafana Labs, supports SDK-based and eBPF collection across most languages.
+  - 📖 [Deep dive](https://podostack.substack.com/p/flame-graphs-prod-prometheus-scale-fourth-signal)
+
+- **[Parca](https://github.com/parca-dev/parca)** - Pure-eBPF continuous profiling with zero instrumentation and under 1% overhead. Profiles land in FrostDB (columnar) so you can diff two deploys and see exactly which function changed. `CNCF Sandbox`
+  - 📖 [Deep dive](https://podostack.substack.com/p/ebpf-tetragon-parca-falco-sloth-alloy)
+
+---
+
+## 📨 Messaging
+
+- **[RabbitMQ Cluster Operator](https://github.com/rabbitmq/cluster-operator)** - Declarative RabbitMQ on Kubernetes — nodes, quorum queues, streams, users, and broker policies as CRDs. Raft-backed data safety, streams for replay, and non-voter replicas that decouple durability from consensus latency.
+  - 📖 [Deep dive](https://podostack.substack.com/p/rabbitmq-quorum-streams-cluster-lying) — why mirrored queues are dead and what replaced them
 
 ---
 
