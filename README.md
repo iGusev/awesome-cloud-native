@@ -88,6 +88,8 @@
 - **[Istio Ambient](https://github.com/istio/istio)** - Service mesh without sidecars. Uses a node-level ztunnel for L4 and on-demand waypoint proxies for L7 — pay only for what you need. `CNCF Graduated`
   - 📖 [Deep dive](https://podostack.substack.com/p/sidecar-free-mesh-slo-from-yaml-and)
 
+- **[KubeStellar Console](https://console.kubestellar.io)** - AI-powered multi-cluster Kubernetes dashboard with real-time observability, AI-guided operations, and 20+ CNCF integrations. `CNCF Sandbox`
+
 ---
 
 ## 📊 Observability
